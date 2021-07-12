@@ -1,4 +1,0 @@
-<!--pages/rum.wxml-->
-<text>{{text}}</text>
-<button bindtap="bindSetData" data-name="set rum"> set runm</button>
-<image src="https://csdnimg.cn/medal/chizhiyiheng@240.png"></image>
