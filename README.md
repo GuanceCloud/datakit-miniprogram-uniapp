@@ -2,7 +2,7 @@
 通过引入sdk文件，监控小程序性能指标，错误log，以及资源请求情况数据，上报到DataFlux 平台datakit
 
 ## 使用方法
-### 在uniapp项目入口文件`main.js`文件以如下方式引入代码
+### 在uniapp项目入口文件`main.js`文件头部位置以如下方式引入代码
 ### npm 引入(可参考uniapp官方[npm引入方式](https://uniapp.dcloud.net.cn/frame?id=npm%e6%94%af%e6%8c%81))
 ```javascript
 //#ifndef H5 || APP-PLUS || APP-NVUE || APP-PLUS-NVUE
