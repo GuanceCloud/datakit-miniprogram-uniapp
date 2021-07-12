@@ -17,7 +17,7 @@ datafluxRum.init({
 })
 //#endif
 ```
-### CDN 下载文件本地方式引入([下载地址](https://static.dataflux.cn/miniapp-sdk/v2/dataflux-rum-uniapp.js))
+### CDN 下载文件本地方式引入([下载地址](https://static.dataflux.cn/miniapp-sdk/v1/dataflux-rum-uniapp.js))
 
 ```javascript
 //#ifndef H5 || APP-PLUS || APP-NVUE || APP-PLUS-NVUE

@@ -12,16 +12,18 @@ var _rum = require("./rum");
 var makeRum = function makeRum(startRumImpl) {
   var isAlreadyInitialized = false;
   var rumGlobal = {
-    init: function init(userConfiguration) {
+    init: function init(Vue, userConfiguration) {
       if (typeof userConfiguration === 'undefined') {
         userConfiguration = {};
       }
+
+      if (!Vue) return;
 
       if (!canInitRum(userConfiguration)) {
         return;
       }
 
-      startRumImpl(userConfiguration);
+      startRumImpl(Vue, userConfiguration);
       isAlreadyInitialized = true;
     }
   };

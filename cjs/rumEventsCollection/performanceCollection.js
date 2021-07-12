@@ -10,9 +10,10 @@ var _lifeCycle = require("../core/lifeCycle");
 var _sdk = require("../core/sdk");
 
 function startPagePerformanceObservable(lifeCycle, configuration) {
-  if (!!_sdk.sdk.getPerformance) {
-    var performance = _sdk.sdk.getPerformance();
+  if (!!_sdk.tracker.getPerformance) {
+    var performance = _sdk.tracker.getPerformance();
 
+    if (!performance || typeof performance.createObserver !== 'function') return;
     var observer = performance.createObserver(function (entryList) {
       lifeCycle.notify(_lifeCycle.LifeCycleEventType.PERFORMANCE_ENTRY_COLLECTED, entryList.getEntries());
     });

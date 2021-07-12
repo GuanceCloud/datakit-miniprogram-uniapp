@@ -35,7 +35,7 @@ var _actionCollection = require("../rumEventsCollection/action/actionCollection"
 
 var _sdk = require("../core/sdk");
 
-var startRum = function startRum(userConfiguration) {
+var startRum = function startRum(Vue, userConfiguration) {
   var configuration = (0, _configuration.commonInit)(userConfiguration, _buildEnv.buildEnv);
   var lifeCycle = new _lifeCycle.LifeCycle();
   var parentContexts = (0, _parentContexts.startParentContexts)(lifeCycle);
@@ -43,12 +43,12 @@ var startRum = function startRum(userConfiguration) {
   (0, _assembly.startRumAssembly)(userConfiguration.applicationId, configuration, lifeCycle, parentContexts);
   (0, _appCollection.startAppCollection)(lifeCycle, configuration);
   (0, _resourceCollection.startResourceCollection)(lifeCycle, configuration);
-  (0, _viewCollection.startViewCollection)(lifeCycle, configuration);
+  (0, _viewCollection.startViewCollection)(lifeCycle, configuration, Vue);
   (0, _errorCollection.startErrorCollection)(lifeCycle, configuration);
   (0, _requestCollection.startRequestCollection)(lifeCycle, configuration);
   (0, _performanceCollection.startPagePerformanceObservable)(lifeCycle, configuration);
-  (0, _setDataCollection.startSetDataColloction)(lifeCycle);
-  (0, _actionCollection.startActionCollection)(lifeCycle, configuration);
+  (0, _setDataCollection.startSetDataColloction)(lifeCycle, Vue);
+  (0, _actionCollection.startActionCollection)(lifeCycle, configuration, Vue);
 };
 
 exports.startRum = startRum;

@@ -6,7 +6,7 @@ export var startupTypes = {
   COLD: 'cold',
   HOT: 'hot'
 };
-export function rewriteApp(configuration, lifeCycle) {
+export function rewriteApp(configuration, lifeCycle, Vue) {
   var originApp = App;
   var appInfo = {
     isStartUp: false // 是否启动
@@ -21,8 +21,6 @@ export function rewriteApp(configuration, lifeCycle) {
       var userDefinedMethod = app[methodName]; // 暂存用户定义的方法
 
       app[methodName] = function (options) {
-        console.log(methodName, 'methodName app');
-
         if (methodName === 'onLaunch') {
           appInfo.isStartUp = true;
           appInfo.isHide = false;

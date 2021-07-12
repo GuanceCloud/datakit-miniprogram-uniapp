@@ -1,8 +1,9 @@
 import { LifeCycleEventType } from '../core/lifeCycle';
-import { sdk } from '../core/sdk';
+import { tracker } from '../core/sdk';
 export function startPagePerformanceObservable(lifeCycle, configuration) {
-  if (!!sdk.getPerformance) {
-    var performance = sdk.getPerformance();
+  if (!!tracker.getPerformance) {
+    var performance = tracker.getPerformance();
+    if (!performance || typeof performance.createObserver !== 'function') return;
     var observer = performance.createObserver(entryList => {
       lifeCycle.notify(LifeCycleEventType.PERFORMANCE_ENTRY_COLLECTED, entryList.getEntries());
     });

@@ -1,21 +1,24 @@
 import { extend, now, throttle, UUID, isNumber } from '../../helper/utils';
 import { trackEventCounts } from '../trackEventCounts';
-import { LifeCycleEventType } from '../../core/lifeCycle'; // 劫持原小程序App方法
+import { LifeCycleEventType } from '../../core/lifeCycle';
+import { sdk } from '../../core/sdk'; // 劫持原小程序App方法
 
 export var THROTTLE_VIEW_UPDATE_PERIOD = 3000;
-export function rewritePage(configuration, lifeCycle) {
-  var originPage = Page;
-  console.log(originPage, 'originPage=====');
+export function rewritePage(configuration, lifeCycle, Vue) {
+  var originVueExtend = Vue.extend;
 
-  Page = function Page(page) {
+  Vue.extend = function (vueOptions) {
     // 合并方法，插入记录脚本
     var currentView,
         startTime = now();
     ['onReady', 'onShow', 'onLoad', 'onUnload', 'onHide'].forEach(methodName => {
-      var userDefinedMethod = page[methodName];
+      var userDefinedMethod = vueOptions[methodName];
 
-      page[methodName] = function () {
-        console.log(methodName, 'methodName page');
+      vueOptions[methodName] = function () {
+        if (this.mpType !== 'page') {
+          return userDefinedMethod && userDefinedMethod.apply(this, arguments);
+        } // 只处理page类型
+
 
         if (methodName === 'onShow' || methodName === 'onLoad') {
           if (typeof currentView === 'undefined') {
@@ -37,7 +40,7 @@ export function rewritePage(configuration, lifeCycle) {
         return userDefinedMethod && userDefinedMethod.apply(this, arguments);
       };
     });
-    return originPage(page);
+    return originVueExtend.call(this, vueOptions);
   };
 }
 
@@ -109,6 +112,7 @@ function newView(lifeCycle, route, startTime) {
   var setLoadEventEnd = function setLoadEventEnd(type) {
     if (type === 'onLoad') {
       loadingTime = now();
+      loadingDuration = loadingTime - startTime;
     } else if (type === 'onShow') {
       showTime = now();
 

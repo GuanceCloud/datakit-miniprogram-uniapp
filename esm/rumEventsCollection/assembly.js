@@ -45,13 +45,7 @@ export function startRumAssembly(applicationId, configuration, lifeCycle, parent
         }
       };
       var rumEvent = extend2Lev(rumContext, deviceContext, viewContext, actionContext, rawRumEvent);
-      var serverRumEvent = withSnakeCaseKeys(rumEvent); // if (
-      // 	serverRumEvent.type === 'view' ||
-      // 	serverRumEvent.type === 'action'
-      // ) {
-      // 	console.log(serverRumEvent, 'serverRumEvent')
-      // }
-
+      var serverRumEvent = withSnakeCaseKeys(rumEvent);
       lifeCycle.notify(LifeCycleEventType.RUM_EVENT_COLLECTED, serverRumEvent);
     }
   });

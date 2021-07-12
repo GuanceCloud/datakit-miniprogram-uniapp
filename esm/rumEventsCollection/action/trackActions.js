@@ -1,38 +1,60 @@
-import { elapsed, now, UUID, getMethods, isObject } from '../../helper/utils';
+import { elapsed, now, UUID, getMethods, isObject, keys } from '../../helper/utils';
 import { LifeCycleEventType } from '../../core/lifeCycle';
-import { MinaTouch } from '../../core/miniaTouch';
 import { trackEventCounts } from '../trackEventCounts';
 import { waitIdlePageActivity } from '../trackPageActiveites';
 import { ActionType } from '../../helper/enums';
-export function trackActions(lifeCycle) {
+export function trackActions(lifeCycle, Vue) {
   var action = startActionManagement(lifeCycle); // New views trigger the discard of the current pending Action
 
   lifeCycle.subscribe(LifeCycleEventType.VIEW_CREATED, function () {
     action.discardCurrent();
   });
-  var originPage = Page;
+  var originVueExtend = Vue.extend;
 
-  Page = function Page(page) {
-    var methods = getMethods(page);
-    methods.forEach(methodName => {
-      clickProxy(page, methodName, function (_action) {
+  Vue.extend = function (vueOptions) {
+    // methods 方法
+    if (vueOptions.methods) {
+      var vueMethods = Object.keys(vueOptions.methods);
+      vueMethods.forEach(methodName => {
+        clickProxy(vueOptions.methods, methodName, function (_action) {
+          action.create(_action.type, _action.name);
+        }, lifeCycle);
+      });
+    }
+
+    var originMethods = getMethods(vueOptions);
+    originMethods.forEach(methodName => {
+      clickProxy(vueOptions, methodName, function (_action) {
         action.create(_action.type, _action.name);
       }, lifeCycle);
     });
-    return originPage(page);
-  };
+    return originVueExtend.call(this, vueOptions);
+  }; // var originPage = Page
+  // Page = function (page) {
+  // 	const methods = getMethods(page)
+  // 	methods.forEach((methodName) => {
+  // 		clickProxy(
+  // 			page,
+  // 			methodName,
+  // 			function (_action) {
+  // 				action.create(_action.type, _action.name)
+  // 			},
+  // 			lifeCycle,
+  // 		)
+  // 	})
+  // 	return originPage(page)
+  // }
+  // var originComponent = Component
+  // Component = function (component) {
+  // 	const methods = getMethods(component)
+  // 	methods.forEach((methodName) => {
+  // 		clickProxy(component, methodName, function (_action) {
+  // 			action.create(_action.type, _action.name)
+  // 		})
+  // 	})
+  // 	return originComponent(component)
+  // }
 
-  var originComponent = Component;
-
-  Component = function Component(component) {
-    var methods = getMethods(component);
-    methods.forEach(methodName => {
-      clickProxy(component, methodName, function (_action) {
-        action.create(_action.type, _action.name);
-      });
-    });
-    return originComponent(component);
-  };
 
   return {
     stop: function stop() {
@@ -57,6 +79,7 @@ function clickProxy(page, methodName, callback, lifeCycle) {
         action.type = actionType;
         action.name = dataset.name || dataset.content || dataset.type;
         callback(action);
+        lifeCycle.notify(LifeCycleEventType.PAGE_ALIAS_ACTION, true);
       } else if (methodName === 'onAddToFavorites') {
         action.type = 'click';
         action.name = '收藏 ' + '标题: ' + result.title + (result.query ? ' query: ' + result.query : '');

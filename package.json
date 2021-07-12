@@ -1,6 +1,6 @@
 {
 	"name": "@cloudcare/rum-uniapp",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"main": "cjs/index.js",
 	"module": "esm/index.js",
 	"miniprogram": "cjs",
@@ -33,13 +33,8 @@
 		"小程序",
 		"miniapp"
 	],
-	"repository": {
-		"url": "https://github.com/CloudCare/dataflux-rum-sdk-miniapp",
-		"type": "git"
-	},
 	"author": "dataflux",
 	"license": "MIT",
-	"homepage": "https://github.com/CloudCare/dataflux-rum-sdk-miniapp/blob/master/README.md",
 	"description": "DataFlux RUM 小程序 端数据指标监控",
 	"dependencies": {}
 }

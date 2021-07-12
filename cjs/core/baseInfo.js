@@ -33,14 +33,15 @@ var BaseInfo = /*#__PURE__*/function () {
         var deviceInfo = _sdk.sdk.getSystemInfoSync();
 
         var osInfo = deviceInfo.system.split(' ');
-        var osVersion = osInfo.length > 1 && osInfo[1];
-        var osVersionMajor = osVersion.split('.').length && osVersion.split('.')[0];
-        var deviceUUid = '';
+        var osVersion = '';
 
-        if (deviceInfo.host) {
-          deviceUUid = deviceInfo.host.appId;
+        if (osInfo.length > 1) {
+          osVersion = osInfo[1];
+        } else {
+          osVersion = osInfo[0] || '';
         }
 
+        var osVersionMajor = osVersion.split('.').length && osVersion.split('.')[0];
         this.deviceInfo = {
           screenSize: "".concat(deviceInfo.screenWidth, "*").concat(deviceInfo.screenHeight, " "),
           platform: deviceInfo.platform,
@@ -48,13 +49,16 @@ var BaseInfo = /*#__PURE__*/function () {
           osVersion: osVersion,
           osVersionMajor: osVersionMajor,
           os: osInfo.length > 1 && osInfo[0],
+          app: deviceInfo.app,
           brand: deviceInfo.brand,
           model: deviceInfo.model,
           frameworkVersion: deviceInfo.SDKVersion,
           pixelRatio: deviceInfo.pixelRatio,
-          deviceUuid: deviceUUid
+          deviceUuid: deviceInfo.deviceId
         };
-      } catch (e) {}
+      } catch (e) {
+        this.deviceInfo = {};
+      }
     }
   }, {
     key: "getClientID",

@@ -12,23 +12,27 @@ var _trackEventCounts2 = require("../trackEventCounts");
 
 var _lifeCycle = require("../../core/lifeCycle");
 
+var _sdk = require("../../core/sdk");
+
 // 劫持原小程序App方法
 var THROTTLE_VIEW_UPDATE_PERIOD = 3000;
 exports.THROTTLE_VIEW_UPDATE_PERIOD = THROTTLE_VIEW_UPDATE_PERIOD;
 
-function rewritePage(configuration, lifeCycle) {
-  var originPage = Page;
-  console.log(originPage, 'originPage=====');
+function rewritePage(configuration, lifeCycle, Vue) {
+  var originVueExtend = Vue.extend;
 
-  Page = function Page(page) {
+  Vue.extend = function (vueOptions) {
     // 合并方法，插入记录脚本
     var currentView,
         startTime = (0, _utils.now)();
     ['onReady', 'onShow', 'onLoad', 'onUnload', 'onHide'].forEach(function (methodName) {
-      var userDefinedMethod = page[methodName];
+      var userDefinedMethod = vueOptions[methodName];
 
-      page[methodName] = function () {
-        console.log(methodName, 'methodName page');
+      vueOptions[methodName] = function () {
+        if (this.mpType !== 'page') {
+          return userDefinedMethod && userDefinedMethod.apply(this, arguments);
+        } // 只处理page类型
+
 
         if (methodName === 'onShow' || methodName === 'onLoad') {
           if (typeof currentView === 'undefined') {
@@ -50,7 +54,7 @@ function rewritePage(configuration, lifeCycle) {
         return userDefinedMethod && userDefinedMethod.apply(this, arguments);
       };
     });
-    return originPage(page);
+    return originVueExtend.call(this, vueOptions);
   };
 }
 
@@ -122,6 +126,7 @@ function newView(lifeCycle, route, startTime) {
   var setLoadEventEnd = function setLoadEventEnd(type) {
     if (type === 'onLoad') {
       loadingTime = (0, _utils.now)();
+      loadingDuration = loadingTime - startTime;
     } else if (type === 'onShow') {
       showTime = (0, _utils.now)();
 

@@ -2,11 +2,11 @@ import { rewritePage } from './index';
 import { RumEventType } from '../../helper/enums';
 import { msToNs } from '../../helper/utils';
 import { LifeCycleEventType } from '../../core/lifeCycle';
-export function startViewCollection(lifeCycle, configuration) {
+export function startViewCollection(lifeCycle, configuration, Vue) {
   lifeCycle.subscribe(LifeCycleEventType.VIEW_UPDATED, function (view) {
     lifeCycle.notify(LifeCycleEventType.RAW_RUM_EVENT_COLLECTED, processViewUpdate(view));
   });
-  return rewritePage(configuration, lifeCycle);
+  return rewritePage(configuration, lifeCycle, Vue);
 }
 
 function processViewUpdate(view) {

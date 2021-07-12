@@ -13,13 +13,13 @@ var _enums = require("../../helper/enums");
 
 var _trackActions = require("./trackActions");
 
-function startActionCollection(lifeCycle, configuration) {
+function startActionCollection(lifeCycle, configuration, Vue) {
   lifeCycle.subscribe(_lifeCycle.LifeCycleEventType.AUTO_ACTION_COMPLETED, function (action) {
     lifeCycle.notify(_lifeCycle.LifeCycleEventType.RAW_RUM_EVENT_COLLECTED, processAction(action));
   });
 
   if (configuration.trackInteractions) {
-    (0, _trackActions.trackActions)(lifeCycle);
+    (0, _trackActions.trackActions)(lifeCycle, Vue);
   }
 }
 

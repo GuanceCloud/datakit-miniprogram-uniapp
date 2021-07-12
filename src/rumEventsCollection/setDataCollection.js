@@ -24,24 +24,27 @@ export function startSetDataColloction(lifeCycle, Vue) {
 
 			// 重写setData
 			if (typeof setData === 'function') {
-				Object.defineProperty(mpInstance.__proto__, 'setData', {
-					configurable: false,
-					enumerable: false,
-					value: function (data, callback) {
+				try {
+					// 这里暂时这么处理 只读属性 会抛出错误
+					mpInstance.setData = function (data, callback) {
 						return setData.call(
 							mpInstance,
 							data,
 							resetSetData(data, callback, lifeCycle, mpInstance),
 						)
-					},
-				})
-				// 这里暂时这么处理
-				mpInstance.setData = function (data, callback) {
-					return setData.call(
-						mpInstance,
-						data,
-						resetSetData(data, callback, lifeCycle, mpInstance),
-					)
+					}
+				} catch (err) {
+					Object.defineProperty(mpInstance.__proto__, 'setData', {
+						configurable: false,
+						enumerable: false,
+						value: function (data, callback) {
+							return setData.call(
+								mpInstance,
+								data,
+								resetSetData(data, callback, lifeCycle, mpInstance),
+							)
+						},
+					})
 				}
 			}
 

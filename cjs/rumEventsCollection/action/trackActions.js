@@ -9,43 +9,64 @@ var _utils = require("../../helper/utils");
 
 var _lifeCycle = require("../../core/lifeCycle");
 
-var _miniaTouch = require("../../core/miniaTouch");
-
 var _trackEventCounts = require("../trackEventCounts");
 
 var _trackPageActiveites = require("../trackPageActiveites");
 
 var _enums = require("../../helper/enums");
 
-function trackActions(lifeCycle) {
+function trackActions(lifeCycle, Vue) {
   var action = startActionManagement(lifeCycle); // New views trigger the discard of the current pending Action
 
   lifeCycle.subscribe(_lifeCycle.LifeCycleEventType.VIEW_CREATED, function () {
     action.discardCurrent();
   });
-  var originPage = Page;
+  var originVueExtend = Vue.extend;
 
-  Page = function Page(page) {
-    var methods = (0, _utils.getMethods)(page);
-    methods.forEach(function (methodName) {
-      clickProxy(page, methodName, function (_action) {
+  Vue.extend = function (vueOptions) {
+    // methods 方法
+    if (vueOptions.methods) {
+      var vueMethods = Object.keys(vueOptions.methods);
+      vueMethods.forEach(function (methodName) {
+        clickProxy(vueOptions.methods, methodName, function (_action) {
+          action.create(_action.type, _action.name);
+        }, lifeCycle);
+      });
+    }
+
+    var originMethods = (0, _utils.getMethods)(vueOptions);
+    originMethods.forEach(function (methodName) {
+      clickProxy(vueOptions, methodName, function (_action) {
         action.create(_action.type, _action.name);
       }, lifeCycle);
     });
-    return originPage(page);
-  };
+    return originVueExtend.call(this, vueOptions);
+  }; // var originPage = Page
+  // Page = function (page) {
+  // 	const methods = getMethods(page)
+  // 	methods.forEach((methodName) => {
+  // 		clickProxy(
+  // 			page,
+  // 			methodName,
+  // 			function (_action) {
+  // 				action.create(_action.type, _action.name)
+  // 			},
+  // 			lifeCycle,
+  // 		)
+  // 	})
+  // 	return originPage(page)
+  // }
+  // var originComponent = Component
+  // Component = function (component) {
+  // 	const methods = getMethods(component)
+  // 	methods.forEach((methodName) => {
+  // 		clickProxy(component, methodName, function (_action) {
+  // 			action.create(_action.type, _action.name)
+  // 		})
+  // 	})
+  // 	return originComponent(component)
+  // }
 
-  var originComponent = Component;
-
-  Component = function Component(component) {
-    var methods = (0, _utils.getMethods)(component);
-    methods.forEach(function (methodName) {
-      clickProxy(component, methodName, function (_action) {
-        action.create(_action.type, _action.name);
-      });
-    });
-    return originComponent(component);
-  };
 
   return {
     stop: function stop() {
@@ -70,6 +91,7 @@ function clickProxy(page, methodName, callback, lifeCycle) {
         action.type = actionType;
         action.name = dataset.name || dataset.content || dataset.type;
         callback(action);
+        lifeCycle.notify(_lifeCycle.LifeCycleEventType.PAGE_ALIAS_ACTION, true);
       } else if (methodName === 'onAddToFavorites') {
         action.type = 'click';
         action.name = '收藏 ' + '标题: ' + result.title + (result.query ? ' query: ' + result.query : '');

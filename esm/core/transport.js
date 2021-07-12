@@ -37,15 +37,15 @@ function batch(request, maxSize, bytesLimit, maxMessageSize, flushTimeout, lifeC
   this.maxMessageSize = maxMessageSize;
   this.flushTimeout = flushTimeout;
   this.lifeCycle = lifeCycle;
+  this.pushOnlyBuffer = [];
+  this.upsertBuffer = {};
+  this.bufferBytesSize = 0;
+  this.bufferMessageCount = 0;
   this.flushOnVisibilityHidden();
   this.flushPeriodically();
 }
 
 batch.prototype = {
-  pushOnlyBuffer: [],
-  upsertBuffer: {},
-  bufferBytesSize: 0,
-  bufferMessageCount: 0,
   add: function add(message) {
     this.addOrUpdate(message);
   },

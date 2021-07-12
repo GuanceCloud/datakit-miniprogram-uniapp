@@ -2,13 +2,13 @@ import { msToNs, extend2Lev } from '../../helper/utils';
 import { LifeCycleEventType } from '../../core/lifeCycle';
 import { RumEventType } from '../../helper/enums';
 import { trackActions } from './trackActions';
-export function startActionCollection(lifeCycle, configuration) {
+export function startActionCollection(lifeCycle, configuration, Vue) {
   lifeCycle.subscribe(LifeCycleEventType.AUTO_ACTION_COMPLETED, function (action) {
     lifeCycle.notify(LifeCycleEventType.RAW_RUM_EVENT_COLLECTED, processAction(action));
   });
 
   if (configuration.trackInteractions) {
-    trackActions(lifeCycle);
+    trackActions(lifeCycle, Vue);
   }
 }
 

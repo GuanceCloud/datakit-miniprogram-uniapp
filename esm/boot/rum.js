@@ -13,7 +13,7 @@ import { startPagePerformanceObservable } from '../rumEventsCollection/performan
 import { startSetDataColloction } from '../rumEventsCollection/setDataCollection';
 import { startActionCollection } from '../rumEventsCollection/action/actionCollection';
 import { sdk } from '../core/sdk';
-export var startRum = function startRum(userConfiguration) {
+export var startRum = function startRum(Vue, userConfiguration) {
   var configuration = commonInit(userConfiguration, buildEnv);
   var lifeCycle = new LifeCycle();
   var parentContexts = startParentContexts(lifeCycle);
@@ -21,10 +21,10 @@ export var startRum = function startRum(userConfiguration) {
   startRumAssembly(userConfiguration.applicationId, configuration, lifeCycle, parentContexts);
   startAppCollection(lifeCycle, configuration);
   startResourceCollection(lifeCycle, configuration);
-  startViewCollection(lifeCycle, configuration);
+  startViewCollection(lifeCycle, configuration, Vue);
   startErrorCollection(lifeCycle, configuration);
   startRequestCollection(lifeCycle, configuration);
   startPagePerformanceObservable(lifeCycle, configuration);
-  startSetDataColloction(lifeCycle);
-  startActionCollection(lifeCycle, configuration);
+  startSetDataColloction(lifeCycle, Vue);
+  startActionCollection(lifeCycle, configuration, Vue);
 };

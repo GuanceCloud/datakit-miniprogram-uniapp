@@ -14,10 +14,30 @@ function getSDK() {
       tracker = '';
 
   try {
+    if (uni && (typeof uni === "undefined" ? "undefined" : _typeof(uni)) === 'object' && typeof uni.request === 'function') {
+      sdk = uni;
+    }
+
     if (wx && (typeof wx === "undefined" ? "undefined" : _typeof(wx)) === 'object' && typeof wx.request === 'function') {
-      sdk = (0, _utils.deepMixObject)({}, wx);
-      tracker = 'wx';
-      wx = sdk;
+      // 微信
+      tracker = wx;
+    } else if (my && (typeof my === "undefined" ? "undefined" : _typeof(my)) === 'object' && typeof my.request === 'function') {
+      // 支付宝
+      tracker = my;
+    } else if (tt && (typeof tt === "undefined" ? "undefined" : _typeof(tt)) === 'object' && typeof tt.request === 'function') {
+      // 头条
+      tracker = tt;
+    } else if (dd && (typeof dd === "undefined" ? "undefined" : _typeof(dd)) === 'object' && typeof dd.request === 'function') {
+      // dingding
+      tracker = dd;
+    } else if (qq && (typeof qq === "undefined" ? "undefined" : _typeof(qq)) === 'object' && typeof qq.request === 'function') {
+      // QQ 小程序、QQ 小游戏
+      tracker = qq;
+    } else if (swan && (typeof swan === "undefined" ? "undefined" : _typeof(swan)) === 'object' && typeof swan.request === 'function') {
+      // 百度小程序
+      tracker = swan;
+    } else {
+      tracker = uni;
     }
   } catch (err) {
     console.warn('unsupport platform, Fail to start');

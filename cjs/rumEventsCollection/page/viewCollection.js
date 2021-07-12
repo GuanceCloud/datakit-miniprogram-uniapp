@@ -13,11 +13,11 @@ var _utils = require("../../helper/utils");
 
 var _lifeCycle = require("../../core/lifeCycle");
 
-function startViewCollection(lifeCycle, configuration) {
+function startViewCollection(lifeCycle, configuration, Vue) {
   lifeCycle.subscribe(_lifeCycle.LifeCycleEventType.VIEW_UPDATED, function (view) {
     lifeCycle.notify(_lifeCycle.LifeCycleEventType.RAW_RUM_EVENT_COLLECTED, processViewUpdate(view));
   });
-  return (0, _index.rewritePage)(configuration, lifeCycle);
+  return (0, _index.rewritePage)(configuration, lifeCycle, Vue);
 }
 
 function processViewUpdate(view) {

@@ -7,37 +7,52 @@ exports.startSetDataColloction = startSetDataColloction;
 
 var _lifeCycle = require("../core/lifeCycle");
 
-function startSetDataColloction(lifeCycle) {
-  var originPage = Page;
-  var originComponent = Component;
+var _utils = require("../helper/utils");
 
-  Page = function Page(page) {
-    var originPageOnLoad = page['onLoad'];
+function resetSetData(data, callback, lifeCycle, mpInstance) {
+  var pendingStartTimestamp = (0, _utils.now)();
 
-    page['onLoad'] = function () {
-      this.setUpdatePerformanceListener && this.setUpdatePerformanceListener({
-        withDataPaths: true
-      }, function (res) {
-        lifeCycle.notify(_lifeCycle.LifeCycleEventType.PAGE_SET_DATA_UPDATE, res);
-      });
-      return originPageOnLoad.apply(this, arguments);
-    };
+  var _callback = function _callback() {
+    lifeCycle.notify(_lifeCycle.LifeCycleEventType.PAGE_SET_DATA_UPDATE, {
+      pendingStartTimestamp: pendingStartTimestamp,
+      updateEndTimestamp: (0, _utils.now)()
+    });
 
-    return originPage(page);
+    if (typeof callback === 'function') {
+      callback.call(mpInstance);
+    }
   };
 
-  Component = function Component(component) {
-    var originComponentAttached = component['attached'];
+  return _callback;
+}
 
-    component['attached'] = function () {
-      this.setUpdatePerformanceListener && this.setUpdatePerformanceListener({
-        withDataPaths: true
-      }, function (res) {
-        lifeCycle.notify(_lifeCycle.LifeCycleEventType.PAGE_SET_DATA_UPDATE, res);
-      });
-      return originComponentAttached.apply(this, arguments);
+function startSetDataColloction(lifeCycle, Vue) {
+  var originVueExtend = Vue.extend;
+
+  Vue.extend = function (vueOptions) {
+    var userDefinedMethod = vueOptions['onLoad'];
+
+    vueOptions['onLoad'] = function () {
+      var mpInstance = this.$scope;
+      var setData = mpInstance.setData; // 重写setData
+
+      if (typeof setData === 'function') {
+        Object.defineProperty(mpInstance.__proto__, 'setData', {
+          configurable: false,
+          enumerable: false,
+          value: function value(data, callback) {
+            return setData.call(mpInstance, data, resetSetData(data, callback, lifeCycle, mpInstance));
+          }
+        }); // 这里暂时这么处理
+
+        mpInstance.setData = function (data, callback) {
+          return setData.call(mpInstance, data, resetSetData(data, callback, lifeCycle, mpInstance));
+        };
+      }
+
+      return userDefinedMethod && userDefinedMethod.apply(this, arguments);
     };
 
-    return originComponent(component);
+    return originVueExtend.call(this, vueOptions);
   };
 }

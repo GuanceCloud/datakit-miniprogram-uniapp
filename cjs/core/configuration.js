@@ -11,6 +11,7 @@ var _utils = require("../helper/utils");
 
 var _enums = require("../helper/enums");
 
+var TRIM_REGIX = /^\s+|\s+$/g;
 var DEFAULT_CONFIGURATION = {
   sampleRate: 100,
   flushTimeout: 30 * _enums.ONE_SECOND,
@@ -37,9 +38,13 @@ var DEFAULT_CONFIGURATION = {
 };
 exports.DEFAULT_CONFIGURATION = DEFAULT_CONFIGURATION;
 
+function trim(str) {
+  return str.replace(TRIM_REGIX, '');
+}
+
 function getDatakitUrlUrl(url) {
-  if (url && url.lastIndexOf('/') === url.length - 1) return url + 'v1/write/rum';
-  return url + '/v1/write/rum';
+  if (url && url.lastIndexOf('/') === url.length - 1) return trim(url) + 'v1/write/rum';
+  return trim(url) + '/v1/write/rum';
 }
 
 function commonInit(userConfiguration, buildEnv) {
