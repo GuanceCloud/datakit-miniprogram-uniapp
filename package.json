@@ -35,6 +35,10 @@
 	],
 	"author": "dataflux",
 	"license": "MIT",
+	"repository": {
+		"url": "https://github.com/DataFlux-cn/datakit-miniprogram-uniapp",
+		"type": "git"
+	},
 	"description": "DataFlux RUM 小程序 端数据指标监控",
 	"dependencies": {}
 }
