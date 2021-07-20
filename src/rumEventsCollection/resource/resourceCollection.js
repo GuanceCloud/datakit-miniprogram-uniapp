@@ -31,6 +31,7 @@ function processRequest(request) {
 		: undefined
 	var urlObj = urlParse(request.url).getParse()
 	var startTime = request.startTime
+	console.log(request, 'request=========')
 	var resourceEvent = extend2Lev(
 		{
 			date: startTime,

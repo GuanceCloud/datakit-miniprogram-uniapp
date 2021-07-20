@@ -25,6 +25,7 @@ function processRequest(request) {
   var correspondingTimingOverrides = timing ? computePerformanceEntryMetrics(timing) : undefined;
   var urlObj = (0, _utils.urlParse)(request.url).getParse();
   var startTime = request.startTime;
+  console.log(request, 'request=========');
   var resourceEvent = (0, _utils.extend2Lev)({
     date: startTime,
     resource: {
