@@ -39,6 +39,7 @@ function proxyXhr() {
 			url: arguments[0].url,
 			type: RequestType.XHR,
 			responseType: arguments[0].responseType || 'text',
+			option: arguments[0]
 		}
 		dataflux_xhr.startTime = now()
 
@@ -46,7 +47,6 @@ function proxyXhr() {
 
 		arguments[0].success = function () {
 			reportXhr(arguments[0])
-
 			if (originalSuccess) {
 				originalSuccess.apply(_this, arguments)
 			}
@@ -76,6 +76,6 @@ function proxyXhr() {
 		beforeSendCallbacks.forEach(function (callback) {
 			callback(dataflux_xhr)
 		})
-		return originalXhrRequest.apply(this, arguments)
+		return originalXhrRequest.call(this, dataflux_xhr.option)
 	}
 }

@@ -11,6 +11,7 @@ import {
 	getQueryParamsFromUrl,
 	replaceNumberCharByPath,
 	jsonStringify,
+	UUID,
 	getStatusGroup,
 } from '../../helper/utils'
 import { RumEventType } from '../../helper/enums'
@@ -29,6 +30,7 @@ function processRequest(request) {
 	var correspondingTimingOverrides = timing
 		? computePerformanceEntryMetrics(timing)
 		: undefined
+	var tracingInfo = computeRequestTracingInfo(request)
 	var urlObj = urlParse(request.url).getParse()
 	var startTime = request.startTime
 	console.log(request, 'request=========')
@@ -49,9 +51,23 @@ function processRequest(request) {
 			},
 			type: RumEventType.RESOURCE,
 		},
+		tracingInfo,
 		correspondingTimingOverrides,
 	)
 	return { startTime: startTime, rawRumEvent: resourceEvent }
+}
+function computeRequestTracingInfo(request) {
+  var hasBeenTraced = request.traceId && request.spanId
+  if (!hasBeenTraced) {
+    return undefined
+  }
+  return {
+    _dd: {
+      spanId: request.spanId,
+      traceId: request.traceId
+    },
+    resource: { id: UUID() }
+  }
 }
 function computePerformanceEntryMetrics(timing) {
 	return {
