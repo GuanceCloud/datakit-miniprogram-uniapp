@@ -1,4 +1,4 @@
-import { extend, now, throttle, UUID, isNumber } from '../../helper/utils'
+import { extend, now, throttle, UUID, isNumber, getActivePage } from '../../helper/utils'
 import { trackEventCounts } from '../trackEventCounts'
 import { LifeCycleEventType } from '../../core/lifeCycle'
 import { sdk } from '../../core/sdk'
@@ -228,11 +228,4 @@ function trackSetDataTime(lifeCycle, callback) {
 	return {
 		stop: subscribe.unsubscribe,
 	}
-}
-function getActivePage() {
-	const curPages = getCurrentPages()
-	if (curPages.length) {
-		return curPages[curPages.length - 1]
-	}
-	return {}
 }
